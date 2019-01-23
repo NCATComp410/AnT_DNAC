@@ -104,12 +104,13 @@ def network_health_result(dnac, executionId):
 
     # This could also be converted to json if desired instead of using regular expressions
     # re_match = re.search(r'"latestHealthScore":(\d+)', data['bapiSyncResponse'])
+    latestHealthScore = 0
     re_match = re.search(r'"latestHealthScore":(\d+)', str(data))
     if re_match:
         latestHealthScore = re_match.group(1)
     else:
         print('Could not find latestHealthScore in response!')
-        exit(1)
+        # exit(1)
 
     return latestHealthScore
 
