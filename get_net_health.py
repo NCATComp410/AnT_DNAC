@@ -6,6 +6,10 @@ from requests.auth import HTTPBasicAuth
 from prettytable import PrettyTable
 import time
 import re
+import pprint
+
+# define a pretty-printer for diagnostics
+pp = pprint.PrettyPrinter(indent=4)
 
 # Used to mock-up functionality for development and testing
 # use_mock = True -> use the mock
@@ -13,7 +17,7 @@ import re
 use_mock = False
 
 # Example of pretty printing a table
-dnac_devices = PrettyTable(['Hostname','Platform Id','Software Type','Software Version','Up Time' ])
+dnac_devices = PrettyTable(['Hostname', 'Platform Id', 'Software Type', 'Software Version', 'Up Time'])
 dnac_devices.padding_width = 1
 
 # Silence the insecure warning due to SSL Certificate
@@ -23,8 +27,10 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 headers = {
               'content-type': "application/json",
               'x-auth-token': "",
-              '__runsync': "True"
+              '__runsync': "True",
+              '__timeout': "30"
           }
+
 
 def check_response_code(response, code):
     if response.status_code != code:
@@ -34,6 +40,7 @@ def check_response_code(response, code):
         return False
     # response OK
     return True
+
 
 def dnac_login(host, username, password):
     if use_mock:
@@ -54,7 +61,7 @@ def network_device_list(dnac, token):
     if use_mock:
         data = {'response': [{'family': 'Routers', 'errorCode': None, 'lastUpdateTime': 1540126573210, 'type': 'Cisco ASR 1001-X Router', 'location': None, 'serialNumber': 'FXS1932Q1SE', 'lastUpdated': '2018-10-21 12:56:13', 'macAddress': '00:c8:8b:80:bb:00', 'role': 'BORDER ROUTER', 'softwareVersion': '16.3.2', 'hostname': 'asr1001-x.abc.inc', 'upTime': '6 days, 19:56:02.75', 'errorDescription': None, 'softwareType': 'IOS-XE', 'inventoryStatusDetail': '<status><general code="SUCCESS"/></status>', 'tagCount': '0', 'locationName': None, 'collectionInterval': 'Global Default', 'roleSource': 'AUTO', 'associatedWlcIp': '', 'bootDateTime': '2018-01-11 15:47:26', 'collectionStatus': 'Managed', 'interfaceCount': '12', 'lineCardCount': '9', 'lineCardId': '5e1b93c1-bed2-4324-b504-7bd0ed564c6d, 80781bb5-32b4-415e-96b4-ce580f66ac6e, aae1f793-fd41-420a-ab0e-4a53ead7af08, 6855077f-deab-479d-bafd-630f3f51cf71, a6fabc8d-3163-4fcb-b6c0-6244d35f69c5, 3ca823be-2c16-4cc8-b870-5993a53f8c50, 9dd486e6-c3b2-4e33-90dc-8e32c8877892, 375caca8-46da-413a-92af-d019a095ef47, 0cb53bff-e124-430e-a2b1-4337b5777a47', 'managementIpAddress': '10.10.22.74', 'memorySize': '3819298032', 'platformId': 'ASR1001-X', 'reachabilityFailureReason': '', 'reachabilityStatus': 'Reachable', 'series': 'Cisco ASR 1000 Series Aggregation Services Routers', 'snmpContact': '', 'snmpLocation': '', 'tunnelUdpPort': None, 'waasDeviceMode': None, 'apManagerInterfaceIp': '', 'instanceTenantId': 'SYS0', 'instanceUuid': '5337536f-0bb4-40eb-abd6-676894c9712c', 'id': '5337536f-0bb4-40eb-abd6-676894c9712c'}, {'family': 'Switches and Hubs', 'errorCode': None, 'lastUpdateTime': 1540126446869, 'type': 'Cisco Catalyst 9300 Switch', 'location': None, 'serialNumber': 'FCW2136L0AK', 'lastUpdated': '2018-10-21 12:54:06', 'macAddress': 'f8:7b:20:67:62:80', 'role': 'ACCESS', 'softwareVersion': '16.6.1', 'hostname': 'cat_9k_1.abc.inc', 'upTime': '5 days, 2:16:08.53', 'errorDescription': None, 'softwareType': 'IOS-XE', 'inventoryStatusDetail': '<status><general code="SUCCESS"/></status>', 'tagCount': '0', 'locationName': None, 'collectionInterval': 'Global Default', 'roleSource': 'AUTO', 'associatedWlcIp': '', 'bootDateTime': '2018-01-11 14:42:26', 'collectionStatus': 'Managed', 'interfaceCount': '41', 'lineCardCount': '2', 'lineCardId': '1cd043ef-aaf7-4b2e-b720-7af782b98b1c, a2b2467b-1692-46d4-8c64-e1765945efc1', 'managementIpAddress': '10.10.22.66', 'memorySize': '889226872', 'platformId': 'C9300-24UX', 'reachabilityFailureReason': '', 'reachabilityStatus': 'Reachable', 'series': 'Cisco Catalyst 9300 Series Switches', 'snmpContact': '', 'snmpLocation': '', 'tunnelUdpPort': None, 'waasDeviceMode': None, 'apManagerInterfaceIp': '', 'instanceTenantId': 'SYS0', 'instanceUuid': '7db64c76-60d6-4ba7-a3cd-3c9efe8b652b', 'id': '7db64c76-60d6-4ba7-a3cd-3c9efe8b652b'}, {'family': 'Switches and Hubs', 'errorCode': None, 'lastUpdateTime': 1540127042444, 'type': 'Cisco Catalyst 9300 Switch', 'location': None, 'serialNumber': 'FCW2140L039', 'lastUpdated': '2018-10-21 13:04:02', 'macAddress': 'f8:7b:20:71:4d:80', 'role': 'ACCESS', 'softwareVersion': '16.6.1', 'hostname': 'cat_9k_2.abc.inc', 'upTime': '5 days, 2:27:17.97', 'errorDescription': None, 'softwareType': 'IOS-XE', 'inventoryStatusDetail': '<status><general code="SUCCESS"/></status>', 'tagCount': '0', 'locationName': None, 'collectionInterval': 'Global Default', 'roleSource': 'AUTO', 'associatedWlcIp': '', 'bootDateTime': '2018-01-11 14:44:26', 'collectionStatus': 'Managed', 'interfaceCount': '41', 'lineCardCount': '2', 'lineCardId': 'c365974a-068d-4edd-a57e-40810e869ec3, f0ce2b8f-28e0-4936-bd7c-25bc277b6cc5', 'managementIpAddress': '10.10.22.70', 'memorySize': '889226872', 'platformId': 'C9300-24UX', 'reachabilityFailureReason': '', 'reachabilityStatus': 'Reachable', 'series': 'Cisco Catalyst 9300 Series Switches', 'snmpContact': '', 'snmpLocation': '', 'tunnelUdpPort': None, 'waasDeviceMode': None, 'apManagerInterfaceIp': '', 'instanceTenantId': 'SYS0', 'instanceUuid': '4757da48-3730-4833-86db-a0ebfbdf0009', 'id': '4757da48-3730-4833-86db-a0ebfbdf0009'}, {'family': 'Switches and Hubs', 'errorCode': None, 'lastUpdateTime': 1540105424432, 'type': 'Cisco Catalyst38xx stack-able ethernet switch', 'location': None, 'serialNumber': 'FOC1833X0AR', 'lastUpdated': '2018-10-21 07:03:44', 'macAddress': 'cc:d8:c1:15:d2:80', 'role': 'DISTRIBUTION', 'softwareVersion': '16.6.2s', 'hostname': 'cs3850.abc.inc', 'upTime': '4 days, 20:22:00.02', 'errorDescription': None, 'softwareType': 'IOS-XE', 'inventoryStatusDetail': '<status><general code="SYNC"/></status>', 'tagCount': '0', 'locationName': None, 'collectionInterval': 'Global Default', 'roleSource': 'AUTO', 'associatedWlcIp': '', 'bootDateTime': '2018-01-15 03:40:27', 'collectionStatus': 'In Progress', 'interfaceCount': '59', 'lineCardCount': '2', 'lineCardId': '42047c3d-4648-4df9-a256-ba1238ba8905, e3b99b6b-ca0b-4bc9-a561-34e1049e88f7', 'managementIpAddress': '10.10.22.69', 'memorySize': '873744896', 'platformId': 'WS-C3850-48U-E', 'reachabilityFailureReason': '', 'reachabilityStatus': 'Reachable', 'series': 'Cisco Catalyst 3850 Series Ethernet Stackable Switch', 'snmpContact': '', 'snmpLocation': '', 'tunnelUdpPort': None, 'waasDeviceMode': None, 'apManagerInterfaceIp': '', 'instanceTenantId': 'SYS0', 'instanceUuid': '99b1ec00-3dcb-44b8-9b6e-2ad6fc141f36', 'id': '99b1ec00-3dcb-44b8-9b6e-2ad6fc141f36'}], 'version': '1.0'}
     else:
-        url = "https://{}/api/v1/network-device".format(dnac['host'])
+        url = "https://{}/dna/intent/api/v1/network-device".format(dnac['host'])
         headers["x-auth-token"] = token
         response = requests.get(url, headers=headers, verify=False)
 
@@ -63,6 +70,7 @@ def network_device_list(dnac, token):
 
         data = response.json()
 
+    # pp.pprint(data)
     for item in data['response']:
         dnac_devices.add_row([item["hostname"],item["platformId"],item["softwareType"],item["softwareVersion"],item["upTime"]])
 
@@ -92,8 +100,11 @@ def network_health_result(dnac, executionId):
                 # wait for 5 seconds to try again
                 time.sleep(5)
 
+    # pp.pprint(data)
+
     # This could also be converted to json if desired instead of using regular expressions
-    re_match = re.search(r'"latestHealthScore":(\d+)', data['bapiSyncResponse'])
+    # re_match = re.search(r'"latestHealthScore":(\d+)', data['bapiSyncResponse'])
+    re_match = re.search(r'"latestHealthScore":(\d+)', str(data))
     if re_match:
         latestHealthScore = re_match.group(1)
     else:
@@ -108,7 +119,7 @@ def network_health_request(dnac, token):
         return 'mock_executionId_abcdefg'
     else:
 
-        url = "https://{}/dna/intent/api/v1/network-health?startTime=&endTime=".format(dnac['host'])
+        url = "https://{}/dna/intent/api/v1/network-health?timestamp=".format(dnac['host'])
         headers["x-auth-token"] = token
         response = requests.get(url, headers=headers, verify=False)
 

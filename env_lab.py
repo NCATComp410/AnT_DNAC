@@ -36,6 +36,7 @@ SOFTWARE.
 ENVIRONMENT_IN_USE = "sandbox"
 
 # Set the 'Environment Variables' based on the lab environment in use
+# See https://developer.cisco.com/site/sandbox/ for more details about the sandbox
 if ENVIRONMENT_IN_USE == "sandbox":
     dnac = {
         "host": "sandboxdnac.cisco.com",
